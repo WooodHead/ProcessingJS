@@ -959,16 +959,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                             // Done?
                             if (_endTime <= system.time) {
                                 _direction = _image = mouse.isLocked = false;
-                            } else if (_direction === LEFT) {
-                                translate(map(system.time, _startTime, _endTime, width, 0), 0);
-                                image(_image, -width, 0);
-                            } else if (_direction === RIGHT) {
-                                translate(map(system.time, _startTime, _endTime, -width, 0), 0);
-                                image(_image, width, 0);
-                            } else /* _direction === DOWN */ {
-                                translate(0, map(system.time, _startTime, _endTime, -height, 0));
-                                image(_image, 0, height);
-                            }
+                            } 
                         }
                     }
                 };
@@ -987,32 +978,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 sceneSlider.draw();
                 puzzle.draw();
 
-                if (puzzle.isSolved) {
-                    translate(200, 500);
-                    scale(constrain(norm(system.time, puzzle.messageStartTime, puzzle.messageCompleteTime), 0, 1));
-
-                    fill(229, 173, 110);
-                    text(puzzle.solvedMessage, 0, 0);
-
-                    // Is it time to auto-advance to another puzzle?
-                    if (system.time >= puzzle.messageEndTime) {
-                        // Search for unsolved puzzles _after_ the current puzzle.
-                        var nextPuzzle = puzzles.find(function(p) {
-                            return p.index > puzzle.index && !p.hasEverBeenSolved;
-                        });
-                        if (!nextPuzzle) {
-                            // Extend search to _all_ unsolved puzzles.
-                            nextPuzzle = puzzles.find(function(p) {
-                                return !p.hasEverBeenSolved;
-                            });
-                        }
-                        if (!nextPuzzle) {
-                            // All puzzles have been solved.  Select next puzzle.
-                            nextPuzzle = puzzles[puzzle.index + 1 < puzzles.length ? puzzle.index + 1 : 0];
-                        }
-                        system.changeScene(system.scene, nextPuzzle.index);
-                    }
-                }
+             
             };
 
             var sceneTitle = function() {
