@@ -208,7 +208,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 ] // 24
             ]; // 24 puzzle maps
 
-          
+
 
             var mouse = {
                 get x() {
@@ -818,13 +818,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     this._arrowButton(RIGHT);
 
                     // Level #
-                    stroke(60, 35, 20);
-                    strokeWeight(2);
-                    fill(225, 160, 64);
-                    rect(80, 15, 240, 50, 10);
-                    fill(60, 35, 20);
-
-                    textAlign(CENTER, CENTER);
                     if (system.scene === 'play') {
                         text('Level #' + (puzzle.index + 1), 200, 40);
                         // Does player want to reset the level?
@@ -836,14 +829,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     }
 
                     // Tray.
-                    noStroke();
-                    fill(60, 35, 20);
-                    rect(-1, 400, 402, 200);
-                    // Blend background color into tray color.
-                    for (var y = 397; y <= 403; y++) {
-                        stroke(lerpColor(color(229, 173, 110), color(60, 35, 20), norm(y, 397, 403)));
-                        line(-1, y, 400, y);
-                    }
+                  
                     if (!mouse.isLocked && !draggedPiece) {
                         this.tray.forEach(this._drawCoaster);
                     }
@@ -852,10 +838,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     this.pieces.forEach(this._updatePiece);
                     this.pieces.sort(this._sortPieces).forEach(this._drawPiece);
 
-                  
+
 
                     if (draggedPiece) {
-                        cursor(MOVE);
+                        // cursor(MOVE);
                     }
                 };
 
@@ -946,7 +932,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                             // Done?
                             if (_endTime <= system.time) {
                                 _direction = _image = mouse.isLocked = false;
-                            } 
+                            }
                         }
                     }
                 };
@@ -965,7 +951,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 sceneSlider.draw();
                 puzzle.draw();
 
-             
+
             };
 
             var sceneTitle = function() {
@@ -1022,7 +1008,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
             };
 
             var sceneSplash = function() {
-              
+
                 system.changeScene('play', 0);
 
             };
@@ -1041,7 +1027,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     }
                 };
 
-             
+
 
                 draw = function() {
                     system.initializeFrame();
@@ -1050,7 +1036,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                         case 'play':
                             scenePlay();
                             break;
-                     
+
                         case 'splash':
                             cache.load();
                             sceneSplash();
