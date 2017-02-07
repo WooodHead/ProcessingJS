@@ -852,20 +852,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     this.pieces.forEach(this._updatePiece);
                     this.pieces.sort(this._sortPieces).forEach(this._drawPiece);
 
-                    // Tutorial arrow.
-                    if (puzzle.index === 0 && !puzzle.hasEverBeenSolved) {
-                        stroke(255, 64, 64);
-                        strokeWeight(6);
-                        noFill();
-                        var center = puzzle.tray[0].point.get();
-                        ellipse(center.x, center.y, 95, 95); // draw circle around piece
-                        arc(240, 370, 160, 310, 147, 230);
-                        pushMatrix();
-                        translate(puzzle.board.left + puzzle.board.width / 2, puzzle.board.top + puzzle.board.height / 2);
-                        rotate(210);
-                        bezier(-30, -50, -20, 20, 20, 20, 30, -50);
-                        popMatrix();
-                    }
+                  
 
                     if (draggedPiece) {
                         cursor(MOVE);
@@ -983,7 +970,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
             var sceneTitle = function() {
                 if (system.frames === 1) {
-                    sceneSlider.start(LEFT);
 
                     // Use puzzle #20 for the title scene.
                     (puzzle = puzzles[19]).reset();
@@ -1064,9 +1050,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                         case 'play':
                             scenePlay();
                             break;
-                        case 'title':
-                            sceneTitle();
-                            break;
+                     
                         case 'splash':
                             cache.load();
                             sceneSplash();
