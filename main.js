@@ -746,23 +746,23 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 [], // placeholder for 0 pieces
                 [new Coaster(200, 500)], // center coordinates
                 [new Coaster(152, 500), new Coaster(248, 500)],
-                [new Coaster(104, 500), new Coaster(200, 500), new Coaster(296, 500)],
-                [new Coaster(56, 500), new Coaster(152, 500), new Coaster(248, 500), new Coaster(344, 500)],
-                [new Coaster(152, 452), new Coaster(248, 452),
-                    new Coaster(104, 548), new Coaster(200, 548), new Coaster(296, 548)
-                ],
-                [new Coaster(104, 452), new Coaster(200, 452), new Coaster(296, 452),
-                    new Coaster(104, 548), new Coaster(200, 548), new Coaster(296, 548)
-                ],
-                [new Coaster(104, 452), new Coaster(200, 452), new Coaster(296, 452),
-                    new Coaster(56, 548), new Coaster(152, 548), new Coaster(248, 548), new Coaster(344, 548)
-                ],
-                [new Coaster(56, 452), new Coaster(152, 452), new Coaster(248, 452), new Coaster(344, 452),
-                    new Coaster(56, 548), new Coaster(152, 548), new Coaster(248, 548), new Coaster(344, 548)
-                ],
-                [new Coaster(80, 452), new Coaster(160, 452), new Coaster(240, 452), new Coaster(320, 452),
-                    new Coaster(40, 548), new Coaster(120, 548), new Coaster(200, 548), new Coaster(280, 548), new Coaster(360, 548)
-                ]
+                // [new Coaster(104, 500), new Coaster(200, 500), new Coaster(296, 500)],
+                // // [new Coaster(56, 500), new Coaster(152, 500), new Coaster(248, 500), new Coaster(344, 500)],
+                // // [new Coaster(152, 452), new Coaster(248, 452),
+                // //     new Coaster(104, 548), new Coaster(200, 548), new Coaster(296, 548)
+                // // ],
+                // [new Coaster(104, 452), new Coaster(200, 452), new Coaster(296, 452),
+                //     new Coaster(104, 548), new Coaster(200, 548), new Coaster(296, 548)
+                // ],
+                // [new Coaster(104, 452), new Coaster(200, 452), new Coaster(296, 452),
+                //     new Coaster(56, 548), new Coaster(152, 548), new Coaster(248, 548), new Coaster(344, 548)
+                // ],
+                // // [new Coaster(56, 452), new Coaster(152, 452), new Coaster(248, 452), new Coaster(344, 452),
+                // //     new Coaster(56, 548), new Coaster(152, 548), new Coaster(248, 548), new Coaster(344, 548)
+                // ],
+                // // [new Coaster(80, 452), new Coaster(160, 452), new Coaster(240, 452), new Coaster(320, 452),
+                //     new Coaster(40, 548), new Coaster(120, 548), new Coaster(200, 548), new Coaster(280, 548), new Coaster(360, 548)
+                // ]
             ]; // Locations in the tray where each piece is hosted
 
             Puzzle.prototype._arrowButton = function(direction) {
@@ -774,26 +774,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     translate(x, 40);
                 } else {
                     translate(x = 365, 40);
-                    scale(-1, 1);
                 }
 
                 // Draw button background.
                 var opacity = this[direction] ? 255 : 128;
-                noStroke();
-                fill(60, 35, 20, opacity);
                 ellipse(1, 0, 45, 45);
-
-                // Draw arrow.
-                fill(225, 160, 64, opacity);
-                beginShape();
-                vertex(-15, 0);
-                vertex(0, -15);
-                vertex(0, -7);
-                vertex(15, -7);
-                vertex(15, 7);
-                vertex(0, 7);
-                vertex(0, 15);
-                endShape(CLOSE);
 
                 popMatrix();
 
@@ -801,14 +786,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 if (!draggedPiece && mouse.isInEllipse(x, 40, 45, 45)) {
                     // Is the button enabled?
                     if (this[direction]) {
-                        cursor(HAND);
 
                         // Has the player left-clicked the button?
                         if (system.scene === 'play' && mouse.consumeClick()) {
                             system.changeScene('play', puzzle.index + (x < 200 ? -1 : 1));
                         }
                     } else {
-                        cursor('not-allowed');
+                        // cursor('not-allowed');
                     }
                 }
             };
