@@ -621,13 +621,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
                         // The first outline is for the outer edge of the tiles,
                         //   but subsequent outlines are for "holes" in the game board.
                         if (isInsideHole) {
-                            fill(229, 173, 110); // background color
+                            // fill(229, 173, 110); // background color
                         } else {
-                            fill(141, 76, 29); // tile face color
+                            // fill(141, 76, 29); // tile face color
                         }
                         for (var i = 1; i <= 10; i++) {
-                            strokeWeight(10 - i);
-                            stroke(lerpColor(color(55, 19, 0), color(225, 160, 64), i / 10));
+                            // strokeWeight(10 - i);
+                            // stroke(lerpColor(color(55, 19, 0), color(225, 160, 64), i / 10));
                             beginShape();
                             outline.forEach(this._vertex);
                             endShape(CLOSE);
