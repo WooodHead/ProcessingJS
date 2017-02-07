@@ -1055,13 +1055,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     }
                 };
 
-                mouseOut = function() {
-                    mouseX = mouseY = Infinity;
-
-                    if (draggedPiece) {
-                        puzzle.releaseDraggedPiece();
-                    }
-                };
+             
 
                 draw = function() {
                     system.initializeFrame();
