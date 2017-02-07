@@ -279,8 +279,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     },
 
                     applicationInitialization: function() {
-                        frameRate(60);
-                        textAlign(CENTER, CENTER);
+                        // frameRate(60);
+                        // textAlign(CENTER, CENTER);
                     },
 
                     // Set-up a new scene.  The actual scene change occurs in `initializeFrame`.
@@ -288,7 +288,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                         /** Actual change deferred to avoid resetting `system.frames` while a scene is being drawn. **/
                         _newSceneData = { newScene: newScene, sceneInfo: sceneInfo };
 
-                        mouse.isLocked = true;
+                        // mouse.isLocked = true;
                     },
 
                     // Advance frame for current scene -OR- set-up new scene.
@@ -308,18 +308,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
                             _frames++;
                         }
 
-                        cursor('default');
-                        resetMatrix();
+                        // cursor('default');
+                        // resetMatrix();
                         _time = millis();
                     },
 
                     finalizeFrame: function() {
-                        if (mouse.isLocked) {
-                            cursor(WAIT);
-                        }
-
-                        mouse.isPressed = mouse.isClicked = false;
-                    }
+                     
+                             }
                 };
             })();
 
@@ -477,8 +473,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     scale(constrain(map(this.point.y, this.coaster.point.y, 400, TRAY_TILE_SIZE, TILE_SIZE), TRAY_TILE_SIZE, TILE_SIZE) / TILE_SIZE); // 400 is the y-coor of the top of the tray
                     translate(-this.width / 2, -this.height / 2);
 
-                    strokeWeight(4);
-                    stroke(this.edgeColor);
+                    // strokeWeight(4);
+                    // stroke(this.edgeColor);
                     fill(this.faceColor);
                     beginShape();
                     this.border.forEach(this._vertex);
@@ -494,166 +490,163 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 } // Callbacks used by Piece.prototype.draw
             } // Piece
 
-            { // BoardTile
-                var BoardTile = function(column, row, left, top) {
-                    this.column = column;
-                    this.row = row;
-                    this.right = (this.left = left) + TILE_SIZE - 1;
-                    this.bottom = (this.top = top) + TILE_SIZE - 1;
+            var BoardTile = function(column, row, left, top) {
+                this.column = column;
+                this.row = row;
+                this.right = (this.left = left) + TILE_SIZE - 1;
+                this.bottom = (this.top = top) + TILE_SIZE - 1;
 
-                    this.piece = false;
+                this.piece = false;
 
-                    this.neighbors = ['edge', 'edge', 'edge', 'edge'];
-                };
+                this.neighbors = ['edge', 'edge', 'edge', 'edge'];
+            };
 
-                BoardTile.prototype.isUnder = function(x, y) {
-                    return x >= this.left && x <= this.right && y >= this.top && y <= this.bottom;
-                };
-            } // BoardTile
+            BoardTile.prototype.isUnder = function(x, y) {
+                return x >= this.left && x <= this.right && y >= this.top && y <= this.bottom;
+            };
 
-            { // Board
-                var Board = function(map) {
-                    this.left = 200 - (this.width = (this.columns = (this.map = map)[0].length) * TILE_SIZE) / 2;
-                    this.top = 234 - (this.height = (this.rows = map.length) * TILE_SIZE) / 2;
+            var Board = function(map) {
+                this.left = 200 - (this.width = (this.columns = (this.map = map)[0].length) * TILE_SIZE) / 2;
+                this.top = 234 - (this.height = (this.rows = map.length) * TILE_SIZE) / 2;
 
-                    // Compute the tiles & outlines.
-                    this.tiles = [];
-                    var grid = []; // grid of tiles used for finding the outlines
-                    this.map.forEach(function(string, row) {
-                        grid.push([]); // create grid row
-                        (map[row] = string.split('')).forEach(function(tileData, column) {
-                            grid[row].push(false); // create/initialize grid square
-                            if (tileData !== ' ') {
-                                this.tiles.push(grid[row][column] = new BoardTile(column, row, this.left + column * TILE_SIZE, this.top + row * TILE_SIZE));
-                            }
-                        }, this);
+                // Compute the tiles & outlines.
+                this.tiles = [];
+                var grid = []; // grid of tiles used for finding the outlines
+                this.map.forEach(function(string, row) {
+                    grid.push([]); // create grid row
+                    (map[row] = string.split('')).forEach(function(tileData, column) {
+                        grid[row].push(false); // create/initialize grid square
+                        if (tileData !== ' ') {
+                            this.tiles.push(grid[row][column] = new BoardTile(column, row, this.left + column * TILE_SIZE, this.top + row * TILE_SIZE));
+                        }
                     }, this);
-                    this.outlines = computeOutlines(grid, this.tiles, 5);
+                }, this);
+                this.outlines = computeOutlines(grid, this.tiles, 5);
 
-                    // Compute the pieces.
-                    this.pieces = [];
-                    for (var i = 0; i <= 9; i++) {
-                        var piece = this._createPiece(i);
-                        if (piece) {
-                            this.pieces.push(piece);
-                        }
+                // Compute the pieces.
+                this.pieces = [];
+                for (var i = 0; i <= 9; i++) {
+                    var piece = this._createPiece(i);
+                    if (piece) {
+                        this.pieces.push(piece);
                     }
-                };
+                }
+            };
 
-                Board.prototype.reset = function() {
-                    this.tiles.forEach(function(tile) { tile.piece = false; }); // remove pieces from board
-                };
+            Board.prototype.reset = function() {
+                // this.tiles.forEach(function(tile) { tile.piece = false; }); // remove pieces from board
+            };
 
-                Board.prototype.draw = function() {
-                    // Draw outlines.
-                    strokeJoin(ROUND);
-                    this.outlines.forEach(this._drawOutline, this);
+            Board.prototype.draw = function() {
+                // Draw outlines.
+                strokeJoin(ROUND);
+                this.outlines.forEach(this._drawOutline, this);
 
-                    // Draw "grout" lines.
-                    stroke(175, 110, 62);
-                    strokeWeight(1);
-                    // this.tiles.forEach(this._drawTileLines);
+                // Draw "grout" lines.
+                stroke(175, 110, 62);
+                strokeWeight(1);
+                // this.tiles.forEach(this._drawTileLines);
 
-                    // If the puzzle has not been solved,
-                    //   allow the player to remove a piece from the board.
-                    if (!puzzle.isSolved) {
-                        var tile = this.tiles.find(this._tileWithPlacedPieceUnderMouse);
-                        if (tile) {
-                            if (mouse.isPressed && mouseButton === LEFT) {
-                                // Start drag.
-                                (draggedPiece = tile.piece).target = mouse;
+                // If the puzzle has not been solved,
+                //   allow the player to remove a piece from the board.
+                if (!puzzle.isSolved) {
+                    var tile = this.tiles.find(this._tileWithPlacedPieceUnderMouse);
+                    if (tile) {
+                        if (mouse.isPressed && mouseButton === LEFT) {
+                            // Start drag.
+                            (draggedPiece = tile.piece).target = mouse;
 
-                                // Remove references of piece from all board tiles.
-                                this.tiles.forEach(function(tile) { tile.piece = tile.piece === draggedPiece ? false : tile.piece; });
+                            // Remove references of piece from all board tiles.
+                            this.tiles.forEach(function(tile) { tile.piece = tile.piece === draggedPiece ? false : tile.piece; });
 
-                                cursor(MOVE);
-                            } else {
-                                cursor(HAND);
-                            }
-                        }
-                    }
-                };
-
-                Board.prototype._createPiece = function(pieceNumber) {
-                    var pieceChar = pieceNumber.toString();
-
-                    // Indexes of bounding rectangle encompassing the piece.
-                    var left = Infinity,
-                        top = Infinity,
-                        right = -1,
-                        bottom = -1;
-                    var i;
-                    this.map.forEach(function(rowData, row) {
-                        i = rowData.indexOf(pieceChar);
-                        if (i >= 0) {
-                            left = min(left, i);
-                            right = max(right, rowData.lastIndexOf(pieceChar));
-                            top = min(top, row);
-                            bottom = row;
-                        }
-                    });
-
-                    // Was the piece found in the map?
-                    if (right >= 0) {
-                        var grid = [];
-                        var tiles = [];
-                        var row = 0;
-                        for (var j = top; j <= bottom; j++) {
-                            grid.push([]); // create grid row
-                            var column = 0;
-                            for (var i = left; i <= right; i++) {
-                                grid[row].push(false); // create/initialize grid square
-                                if (this.map[j][i] === pieceChar) {
-                                    tiles.push(grid[row][column] = new PieceTile(column, row));
-                                }
-                                column++;
-                            }
-                            row++;
-                        }
-
-                        return new Piece(grid, tiles, pieceNumber);
-                    }
-                    // Piece not found in map; return undefined;
-                };
-
-                { // Callbacks used by Board.prototype.draw
-                    Board.prototype._drawOutline = function(outline, isInsideHole) {
-                        // The first outline is for the outer edge of the tiles,
-                        //   but subsequent outlines are for "holes" in the game board.
-                        if (isInsideHole) {
-                            // fill(229, 173, 110); // background color
+                            cursor(MOVE);
                         } else {
-                            // fill(141, 76, 29); // tile face color
+                            cursor(HAND);
                         }
-                        for (var i = 1; i <= 10; i++) {
-                            // strokeWeight(10 - i);
-                            // stroke(lerpColor(color(55, 19, 0), color(225, 160, 64), i / 10));
-                            beginShape();
-                            outline.forEach(this._vertex);
-                            endShape(CLOSE);
+                    }
+                }
+            };
 
-                            noFill();
+            Board.prototype._createPiece = function(pieceNumber) {
+                var pieceChar = pieceNumber.toString();
+
+                // Indexes of bounding rectangle encompassing the piece.
+                var left = Infinity,
+                    top = Infinity,
+                    right = -1,
+                    bottom = -1;
+                var i;
+                this.map.forEach(function(rowData, row) {
+                    i = rowData.indexOf(pieceChar);
+                    if (i >= 0) {
+                        left = min(left, i);
+                        right = max(right, rowData.lastIndexOf(pieceChar));
+                        top = min(top, row);
+                        bottom = row;
+                    }
+                });
+
+                // Was the piece found in the map?
+                if (right >= 0) {
+                    var grid = [];
+                    var tiles = [];
+                    var row = 0;
+                    for (var j = top; j <= bottom; j++) {
+                        grid.push([]); // create grid row
+                        var column = 0;
+                        for (var i = left; i <= right; i++) {
+                            grid[row].push(false); // create/initialize grid square
+                            if (this.map[j][i] === pieceChar) {
+                                tiles.push(grid[row][column] = new PieceTile(column, row));
+                            }
+                            column++;
                         }
-                    };
+                        row++;
+                    }
 
-                    Board.prototype._vertex = function(corner) {
-                        vertex(corner.x, corner.y);
-                    };
+                    return new Piece(grid, tiles, pieceNumber);
+                }
+                // Piece not found in map; return undefined;
+            };
 
-                    // Board.prototype._drawTileLines = function(tile) {
-                    //     // if (tile.neighbors[0] instanceof BoardTile) { // left
-                    //     //     line(tile.left, tile.top, tile.left, tile.bottom);
-                    //     // }
-                    //     // if (tile.neighbors[1] instanceof BoardTile) { // top
-                    //     //     line(tile.left, tile.top, tile.right, tile.top);
-                    //     // }
-                    // };
+            { // Callbacks used by Board.prototype.draw
+                Board.prototype._drawOutline = function(outline, isInsideHole) {
+                    // The first outline is for the outer edge of the tiles,
+                    //   but subsequent outlines are for "holes" in the game board.
+                    if (isInsideHole) {
+                        // fill(229, 173, 110); // background color
+                    } else {
+                        // fill(141, 76, 29); // tile face color
+                    }
+                    for (var i = 1; i <= 10; i++) {
+                        // strokeWeight(10 - i);
+                        // stroke(lerpColor(color(55, 19, 0), color(225, 160, 64), i / 10));
+                        beginShape();
+                        outline.forEach(this._vertex);
+                        endShape(CLOSE);
 
-                    Board.prototype._tileWithPlacedPieceUnderMouse = function(tile) {
-                        return tile.piece && mouse.isInRect(tile.left, tile.top, TILE_SIZE, TILE_SIZE);
-                    };
-                } // Callbacks used by Board.prototype.draw
-            } // Board
+                        noFill();
+                    }
+                };
+
+                Board.prototype._vertex = function(corner) {
+                    vertex(corner.x, corner.y);
+                };
+
+                // Board.prototype._drawTileLines = function(tile) {
+                //     // if (tile.neighbors[0] instanceof BoardTile) { // left
+                //     //     line(tile.left, tile.top, tile.left, tile.bottom);
+                //     // }
+                //     // if (tile.neighbors[1] instanceof BoardTile) { // top
+                //     //     line(tile.left, tile.top, tile.right, tile.top);
+                //     // }
+                // };
+
+                Board.prototype._tileWithPlacedPieceUnderMouse = function(tile) {
+                    return tile.piece && mouse.isInRect(tile.left, tile.top, TILE_SIZE, TILE_SIZE);
+                };
+            } // Callbacks used by Board.prototype.draw
+
 
 
             var Puzzle = function(index) {
@@ -921,7 +914,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
             var scenePlay = function() {
                 if (system.frames === 1) {
-                    system.applicationInitialization();
 
                     sceneSlider.start(!puzzle || system.sceneInfo > puzzle.index ? LEFT : system.sceneInfo === puzzle.index ? DOWN : RIGHT);
 
@@ -935,58 +927,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
             };
 
-            var sceneTitle = function() {
-                if (system.frames === 1) {
-
-                    // Use puzzle #20 for the title scene.
-                    (puzzle = puzzles[19]).reset();
-                    puzzle[RIGHT] = true; // override default
-
-                    puzzle.pieces[0].point.set(150, 184); // position pieces on board
-                    puzzle.pieces[1].point.set(225, 134);
-                    puzzle.pieces[2].point.set(100, 234);
-                    puzzle.pieces[3].point.set(225, 209);
-                    puzzle.pieces[4].point.set(325, 234);
-                    puzzle.pieces[5].point.set(275, 259);
-                    puzzle.pieces[6].point.set(150, 309);
-                    puzzle.pieces[7].point.set(250, 309);
-                }
-
-                background(229, 173, 110);
-                sceneSlider.draw();
-                scale(1, 1.5);
-                puzzle.draw();
-
-                translate(200, puzzle.board.top + puzzle.board.height / 2);
-
-                for (var i = 0; i <= 13; i++) {
-                    pushMatrix();
-                    scale(map(i, 0, 13, 1, 0.9));
-                    if (system.sceneInfo === UP) { // show brown version
-                        if (floor(system.frames / 100) & 1) { // flash every 100 frames
-                            fill(lerpColor(color(225, 160, 64), color(55, 19, 0), norm(i, 0, 13)));
-                        } else {
-                            fill(lerpColor(color(55, 19, 0), color(225, 160, 64), norm(i, 0, 13)));
-                        }
-                    } else /* system.sceneInfo === UP */ { // show cyan version
-                        if (floor(system.frames / 100) & 1) { // flash every 100 frames
-                            fill(lerpColor(color(0, 192, 192), color(0, 64, 64), norm(i, 0, 13)));
-                        } else {
-                            fill(lerpColor(color(0, 64, 64), color(0, 192, 192), norm(i, 0, 13)));
-                        }
-                    }
-                    textAlign(CENTER, BOTTOM);
-                    text('BLOCK', 0, 15);
-                    textAlign(CENTER, TOP);
-                    text('PUZZLE', 0, -21);
-                    popMatrix();
-                }
-
-                if (mouse.isClicked) {
-                    puzzle = undefined;
-                    system.changeScene('play', 0);
-                }
-            };
+           
 
             var sceneSplash = function() {
 
