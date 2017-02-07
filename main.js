@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
                 return {
                     get isDebugging() {
-                        return false;
+                        return true;
                     },
 
                     get scene() {
@@ -306,7 +306,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 Piece.prototype.reset = function(coaster) {
                     (this.coaster = coaster).piece = this;
                     this.point.set(coaster.point);
-                    this.isLockedToMouse = this.target = false;
+                    // this.isLockedToMouse = this.target = false;
                 };
 
                 Piece.prototype.update = function() {
@@ -397,33 +397,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 
             Board.prototype.draw = function() {
-                // Draw outlines.
-                strokeJoin(ROUND);
-                this.outlines.forEach(this._drawOutline, this);
+                 this.outlines.forEach(this._drawOutline, this);
 
-                // Draw "grout" lines.
-                stroke(175, 110, 62);
-                strokeWeight(1);
-                // this.tiles.forEach(this._drawTileLines);
-
-                // If the puzzle has not been solved,
-                //   allow the player to remove a piece from the board.
-                if (!puzzle.isSolved) {
-                    var tile = this.tiles.find(this._tileWithPlacedPieceUnderMouse);
-                    if (tile) {
-                        if (mouse.isPressed && mouseButton === LEFT) {
-                            // Start drag.
-                            (draggedPiece = tile.piece).target = mouse;
-
-                            // Remove references of piece from all board tiles.
-                            this.tiles.forEach(function(tile) { tile.piece = tile.piece === draggedPiece ? false : tile.piece; });
-
-                            cursor(MOVE);
-                        } else {
-                            cursor(HAND);
-                        }
-                    }
-                }
             };
 
             Board.prototype._createPiece = function(pieceNumber) {
@@ -502,7 +477,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 // };
 
                 Board.prototype._tileWithPlacedPieceUnderMouse = function(tile) {
-                    return tile.piece && mouse.isInRect(tile.left, tile.top, TILE_SIZE, TILE_SIZE);
+                    // return tile.piece && mouse.isInRect(tile.left, tile.top, TILE_SIZE, TILE_SIZE);
                 };
             } // Callbacks used by Board.prototype.draw
 
@@ -510,7 +485,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
             var Puzzle = function(index) {
                 this.tray = this._coasters[(this.pieces = (this.board = new Board(this.map = maps[this.index = index])).pieces).length];
-                this.hasEverBeenSolved = this.isSolved = false;
+                // this.hasEverBeenSolved = this.isSolved = false;
             };
 
             Puzzle.prototype.reset = function() {
@@ -533,7 +508,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 this.tray.forEach(function(coaster) {
                     var i = floor(random(indexes.length));
                     this.pieces[indexes[i]].reset(coaster);
-                    indexes.splice(i, 1);
+                    // indexes.splice(i, 1);
                 }, this);
             };
 
@@ -568,23 +543,15 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     if (this.board.tiles.every(function(tile) {
                             return tile.piece;
                         })) {
-                        // Was this the last puzzle to have been solved?
-                        var allBefore = puzzles.every(function(p) {
-                            return p.hasEverBeenSolved;
-                        });
-                        this.hasEverBeenSolved = this.isSolved = true;
-                        var lastPuzzleSoved = allBefore !== puzzles.every(function(p) {
-                            return p.hasEverBeenSolved;
-                        });
+                        console.log("success");
+                        
 
                         // Is the first time that ALL puzzles have been marked as having ever been solved...
-                        this.solvedMessage = lastPuzzleSoved ? 'Congratulations!\nAll Puzzles\n Solved!' :
-                            'Puzzle\nSolved';
-                        this.messageCompleteTime = (this.messageStartTime = system.time) + 500; // 1/2 second to grow message
-                        this.messageEndTime = this.messageCompleteTime + (lastPuzzleSoved ? Infinity : 500); // 1/2 second before next puzzle
+                        // this.solvedMessage = lastPuzzleSoved ? 'Congratulations!\nAll Puzzles\n Solved!' :
+                        //     'Puzzle\nSolved';
+                        // this.messageCompleteTime = (this.messageStartTime = system.time) + 500; // 1/2 second to grow message
+                        // this.messageEndTime = this.messageCompleteTime + (lastPuzzleSoved ? Infinity : 500); // 1/2 second before next puzzle
 
-                        // Enable the "next puzzle" button.
-                        this[RIGHT] = this.index < puzzles.length - 1;
                     }
                 } else {
                     // Cancel drag; send piece back to tray.
@@ -616,41 +583,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 // ]
             ]; // Locations in the tray where each piece is hosted
 
-            Puzzle.prototype._arrowButton = function(direction) {
-                pushMatrix();
-
-                // Position & orientate button.
-                var x = 35;
-                if (direction === LEFT) {
-                    translate(x, 40);
-                } else {
-                    translate(x = 365, 40);
-                }
-
-                // Draw button background.
-                var opacity = this[direction] ? 255 : 128;
-                ellipse(1, 0, 45, 45);
-
-                popMatrix();
-
-                // Is mouse over the button?
-                if (!draggedPiece && mouse.isInEllipse(x, 40, 45, 45)) {
-                    // Is the button enabled?
-                    if (this[direction]) {
-
-                        // Has the player left-clicked the button?
-                        if (system.scene === 'play' && mouse.consumeClick()) {
-                            system.changeScene('play', puzzle.index + (x < 200 ? -1 : 1));
-                        }
-                    } else {
-                        // cursor('not-allowed');
-                    }
-                }
-            };
-
             Puzzle.prototype.draw = function() {
-                this._arrowButton(LEFT);
-                this._arrowButton(RIGHT);
 
                 // Level #
                 if (system.scene === 'play') {
@@ -671,7 +604,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
                 this.board.draw();
                 this.pieces.forEach(this._updatePiece);
-                this.pieces.sort(this._sortPieces).forEach(this._drawPiece);
+                // this.pieces.sort(this._sortPieces).forEach(this._drawPiece);
 
 
 
@@ -698,7 +631,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
             };
 
             Puzzle.prototype._sortPieces = function(a, b) {
-                return b.zOrder - a.zOrder;
+                // return b.zOrder - a.zOrder;
             };
 
             Puzzle.prototype._drawPiece = function(piece) {
