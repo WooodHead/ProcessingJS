@@ -552,7 +552,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     // Draw "grout" lines.
                     stroke(175, 110, 62);
                     strokeWeight(1);
-                    this.tiles.forEach(this._drawTileLines);
+                    // this.tiles.forEach(this._drawTileLines);
 
                     // If the puzzle has not been solved,
                     //   allow the player to remove a piece from the board.
@@ -640,14 +640,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
                         vertex(corner.x, corner.y);
                     };
 
-                    Board.prototype._drawTileLines = function(tile) {
-                        if (tile.neighbors[0] instanceof BoardTile) { // left
-                            line(tile.left, tile.top, tile.left, tile.bottom);
-                        }
-                        if (tile.neighbors[1] instanceof BoardTile) { // top
-                            line(tile.left, tile.top, tile.right, tile.top);
-                        }
-                    };
+                    // Board.prototype._drawTileLines = function(tile) {
+                    //     // if (tile.neighbors[0] instanceof BoardTile) { // left
+                    //     //     line(tile.left, tile.top, tile.left, tile.bottom);
+                    //     // }
+                    //     // if (tile.neighbors[1] instanceof BoardTile) { // top
+                    //     //     line(tile.left, tile.top, tile.right, tile.top);
+                    //     // }
+                    // };
 
                     Board.prototype._tileWithPlacedPieceUnderMouse = function(tile) {
                         return tile.piece && mouse.isInRect(tile.left, tile.top, TILE_SIZE, TILE_SIZE);
