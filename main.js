@@ -27,42 +27,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
         with(processing) {
 
-            // angleMode = "degrees";
 
-            /*
-            Block Puzzle - A series of fun & addictive logic puzzles.
-
-            Inspired by the app from BitMango: https://itunes.apple.com/us/app/-/id983489163
-
-            By: Blue Leaf  */
-            /** Sometimes Difficult, Always Solvable™ **/
-            /*
-
-                        Subscribe: https://www.khanacademy.org/cs/-/6145891777511424
-
-                        ACKNOWLEDGEMENTS:
-                            Adapted puzzle & piece outlining from Peter Collingridge:
-                                https://www.khanacademy.org/profile/peterwcollingridge/
-                                https://www.khanacademy.org/cs/find-outlines/6733900069076992
-                        */
-            /**
-                        INSTRUCTIONS:
-                            • Drag the blocks to fill the game board.
-                            • Have Fun! :)
-
-                        MORE ABOUT THE GAME:
-                            • There are 24 levels.
-                            • You may go back to previously completed puzzles, but may not skip ahead (unless you change the 'unlockAllPuzzles' variable.
-                            • Right-click the level # (at the top) to restart the level.
-                            • If you want to make a spin-off, you'll need to:
-                                • Click the "Spin-off" button beneath the canvas;
-                                • Click the "Save" button;
-                                • Click the "Settings" button above the canvas;
-                                • Change the height to 600;
-                                • Click the "Save and Close" button;
-                                • Refresh the webpage.
-                        **/
-            var unlockAllPuzzles = false;
+            var unlockAllPuzzles = true;
 
             { // Miscellaneous
                 var cache = {}; // hoisted
@@ -242,23 +208,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 ] // 24
             ]; // 24 puzzle maps
 
-            var fonts = (function() {
-                var _title = createFont('Segoe WP Black', 104);
-                var _levelId = createFont('Arial Bold Italic', 36);
-                var _solved = createFont('Impact Bold', 50);
-
-                return {
-                    get title() {
-                        return _title;
-                    },
-                    get levelId() {
-                        return _levelId;
-                    },
-                    get solved() {
-                        return _solved;
-                    }
-                };
-            })();
+          
 
             var mouse = {
                 get x() {
@@ -873,7 +823,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     fill(225, 160, 64);
                     rect(80, 15, 240, 50, 10);
                     fill(60, 35, 20);
-                    textFont(fonts.levelId);
+
                     textAlign(CENTER, CENTER);
                     if (system.scene === 'play') {
                         text('Level #' + (puzzle.index + 1), 200, 40);
@@ -1040,7 +990,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 if (puzzle.isSolved) {
                     translate(200, 500);
                     scale(constrain(norm(system.time, puzzle.messageStartTime, puzzle.messageCompleteTime), 0, 1));
-                    textFont(fonts.solved);
+
                     fill(229, 173, 110);
                     text(puzzle.solvedMessage, 0, 0);
 
@@ -1089,7 +1039,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 puzzle.draw();
 
                 translate(200, puzzle.board.top + puzzle.board.height / 2);
-                textFont(fonts.title);
+
                 for (var i = 0; i <= 13; i++) {
                     pushMatrix();
                     scale(map(i, 0, 13, 1, 0.9));
@@ -1120,63 +1070,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
             };
 
             var sceneSplash = function() {
-                if (system.frames === 1) {
-                    frameRate(Infinity);
+              
+                system.changeScene('play', 0);
 
-                    sceneSplash.image = getImage('avatars/leaf-blue');
-                    sceneSplash.startTime = system.time;
-                }
-
-                // Center logo, scale to 400x400.
-                resetMatrix();
-                translate(width > height ? (width - height) / 2 : 0, height > width ? (height - width) / 2 : 0);
-                scale(min(width / 400, height / 400));
-
-                // 4 seconds <=> 180 frames @ 45 fps
-                var frame = map(system.time - sceneSplash.startTime, 0, 4000, 1, 180);
-
-                // Compute size & position of leaf image.
-                var angle = 90;
-                var radius = 160;
-                var rotation = 0;
-                var size = map(frame, 0, 120, 0, 300);
-                var xSize = abs(size * cos(frame * 360 / 120));
-                var ySize = abs(size * sin(frame * 90 / 120));
-                if (frame <= 60) {
-                    angle = map(frame, 0, 60, 180, 35);
-                    radius = map(frame, 0, 60, 200, 170);
-                    rotation = map(frame, 0, 60, 0, 270);
-                } else if (frame <= 100) {
-                    angle = map(frame, 60, 100, 35, 119);
-                    radius = map(frame, 60, 100, 170, 250);
-                    rotation = map(frame, 60, 100, 270, 630);
-                } else if (frame <= 120) {
-                    angle = map(frame, 100, 120, 119, 90);
-                    radius = map(frame, 100, 120, 250, 160);
-                    rotation = map(frame, 100, 120, 630, 720);
-                } else {
-                    xSize = ySize = 300;
-                }
-
-                background(250, 174, 80); // orange
-                fill(29, 86, 170, peg(map(frame, 100, 120, 0, 255))); // blue
-                textFont(createFont('Arial Bold'), 48);
-                textAlign(CENTER, TOP);
-                text('Blue Leaf Studio', 200, 300);
-
-                translate(220 + cos(angle) * radius, sin(angle) * radius);
-                rotate(rotation);
-                image(sceneSplash.image, -xSize / 2, -ySize / 2, xSize, ySize);
-
-                sceneSplash.dismiss = sceneSplash.dismiss || mouse.isClicked || frame >= 180; // 180 frames / 45 fps = 4 second duration
-                if (!mouseIsPressed && sceneSplash.dismiss && cache.isLoaded) {
-                    puzzle = false;
-                    if (mouseButton === RIGHT && (keyCode === UP || keyCode === DOWN)) {
-                        system.changeScene('title', keyCode);
-                    } else {
-                        system.changeScene('play', 0);
-                    }
-                }
             };
 
             { // Processing.JS events
