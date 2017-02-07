@@ -597,7 +597,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
             Puzzle.prototype._coasters = [ // Locations in the tray where each piece is hosted
                 [], // placeholder for 0 pieces
                 [new Coaster(200, 500)], // center coordinates
-                [new Coaster(152, 500), new Coaster(248, 500)],
                 // [new Coaster(104, 500), new Coaster(200, 500), new Coaster(296, 500)],
                 // // [new Coaster(56, 500), new Coaster(152, 500), new Coaster(248, 500), new Coaster(344, 500)],
                 // // [new Coaster(152, 452), new Coaster(248, 452),
@@ -623,7 +622,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 // Position & orientate button.
                 var x = 35;
                 if (direction === LEFT) {
-                    // translate(x, 40);
+                    translate(x, 40);
                 } else {
                     translate(x = 365, 40);
                 }
