@@ -74,138 +74,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     ' 23 ',
                     ' 23 '
                 ], // 5
-                [
-                    ' 0 1 ',
-                    '00111',
-                    ' 221 ',
-                    '32444',
-                    ' 2 4 '
-                ],
-                [
-                    '  0  ',
-                    '10002',
-                    '11022',
-                    '13 42',
-                    '33344'
-                ],
-                [
-                    '00 1',
-                    '0111',
-                    ' 22 ',
-                    ' 324',
-                    '3324'
-                ],
-                [
-                    '  00  ',
-                    ' 1100 ',
-                    '112344',
-                    ' 3334 ',
-                    ' 5555 '
-                ],
-                [
-                    '00111',
-                    '0   1',
-                    '22233',
-                    '24445',
-                    '  4  '
-                ], // 10
-                [
-                    '0012',
-                    '3011',
-                    '3014',
-                    '3554',
-                    '3554'
-                ],
-                [
-                    '  000  ',
-                    ' 12223 ',
-                    '1142533',
-                    ' 14556 ',
-                    ' 44566 '
-                ],
-                [
-                    '000 11',
-                    '022341',
-                    '223331',
-                    '55536 ',
-                    ' 5666 '
-                ],
-                [
-                    '001233',
-                    '041555',
-                    '04115 ',
-                    ' 4666 '
-                ],
-                [
-                    '00  11',
-                    '022341',
-                    '223341',
-                    '555346',
-                    ' 5  4 '
-                ], // 15
-                [
-                    ' 00011',
-                    '203444',
-                    '2 3335',
-                    '666655',
-                    '    75'
-                ],
-                [
-                    '01233',
-                    '02224',
-                    '05264',
-                    '05764',
-                    '55766'
-                ],
-                [
-                    '001223',
-                    '044433',
-                    '056677',
-                    '555667'
-                ],
-                [
-                    '01122 ',
-                    '0022  ',
-                    '304556',
-                    '344756',
-                    '33475 '
-                ],
-                [
-                    ' 0111 ',
-                    '200334',
-                    '203354',
-                    '226754',
-                    ' 6677 '
-                ], // 20
-                [
-                    '000112',
-                    '304442',
-                    '334552',
-                    '  65  ',
-                    '  67  '
-                ],
-                [
-                    ' 0122 ',
-                    '000322',
-                    '403355',
-                    '443665',
-                    '776688'
-                ],
-                [
-                    '011223',
-                    '044523',
-                    '647533',
-                    '67778 ',
-                    '66788 '
-                ],
-                [
-                    '001 222',
-                    '0 1   2',
-                    '0   3 4',
-                    '5 333 4',
-                    '5  6  4',
-                    '5566674'
-                ] // 24
+
             ]; // 24 puzzle maps
 
 
@@ -278,10 +147,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                         return _time;
                     },
 
-                    applicationInitialization: function() {
-                        // frameRate(60);
-                        // textAlign(CENTER, CENTER);
-                    },
+
 
                     // Set-up a new scene.  The actual scene change occurs in `initializeFrame`.
                     changeScene: function(newScene, sceneInfo) {
@@ -313,9 +179,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                         _time = millis();
                     },
 
-                    finalizeFrame: function() {
-                     
-                             }
+
                 };
             })();
 
@@ -396,7 +260,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
             var Coaster = function(centerX, centerY) { // Placeholder for piece while in the tray
                 this.point = new PVector(centerX, centerY);
-                this.piece = false;
+                // this.piece = false;
             }; // Placeholder for piece while in the tray
 
             var PieceTile = function(column, row) {
@@ -483,11 +347,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     popMatrix();
                 };
 
-                { // Callback used by Piece.prototype.draw
-                    Piece.prototype._vertex = function(corner) {
-                        vertex(corner.x, corner.y);
-                    };
-                } // Callbacks used by Piece.prototype.draw
+                Piece.prototype._vertex = function(corner) {
+                    vertex(corner.x, corner.y);
+                };
             } // Piece
 
             var BoardTile = function(column, row, left, top) {
@@ -533,9 +395,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 }
             };
 
-            Board.prototype.reset = function() {
-                // this.tiles.forEach(function(tile) { tile.piece = false; }); // remove pieces from board
-            };
 
             Board.prototype.draw = function() {
                 // Draw outlines.
@@ -657,7 +516,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
             Puzzle.prototype.reset = function() {
                 draggedPiece = this.isSolved = false;
 
-                this.board.reset();
+                // this.board.reset();
 
                 // Is the player allowed to move to the previous/next (LEFT/RIGHT) puzzle?
                 this[LEFT] = this.index > 0;
@@ -764,7 +623,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 // Position & orientate button.
                 var x = 35;
                 if (direction === LEFT) {
-                    translate(x, 40);
+                    // translate(x, 40);
                 } else {
                     translate(x = 365, 40);
                 }
@@ -927,7 +786,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
             };
 
-           
+
 
             var sceneSplash = function() {
 
@@ -965,7 +824,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
                             break;
                     }
 
-                    system.finalizeFrame();
                 };
             } // Processing.JS events
 
