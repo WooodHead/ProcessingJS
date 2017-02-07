@@ -655,224 +655,221 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 } // Callbacks used by Board.prototype.draw
             } // Board
 
-            { // Puzzle
-                var Puzzle = function(index) {
-                    this.tray = this._coasters[(this.pieces = (this.board = new Board(this.map = maps[this.index = index])).pieces).length];
-                    this.hasEverBeenSolved = this.isSolved = false;
-                };
 
-                Puzzle.prototype.reset = function() {
-                    draggedPiece = this.isSolved = false;
+            var Puzzle = function(index) {
+                this.tray = this._coasters[(this.pieces = (this.board = new Board(this.map = maps[this.index = index])).pieces).length];
+                this.hasEverBeenSolved = this.isSolved = false;
+            };
 
-                    this.board.reset();
+            Puzzle.prototype.reset = function() {
+                draggedPiece = this.isSolved = false;
 
-                    // Is the player allowed to move to the previous/next (LEFT/RIGHT) puzzle?
-                    this[LEFT] = this.index > 0;
-                    this[RIGHT] = (this.index < puzzles.length - 1) && (unlockAllPuzzles || puzzles[this.index].hasEverBeenSolved);
+                this.board.reset();
 
-                    // Assign pieces to tray coasters.
+                // Is the player allowed to move to the previous/next (LEFT/RIGHT) puzzle?
+                this[LEFT] = this.index > 0;
+                this[RIGHT] = (this.index < puzzles.length - 1) && (unlockAllPuzzles || puzzles[this.index].hasEverBeenSolved);
 
-                    // Create list of indexes into this.pieces.
-                    var indexes = [];
-                    for (var i = 0; i < this.pieces.length; i++) {
-                        indexes.push(i);
-                    }
-                    // For each coaster on the tray, randomly select a piece to place on the coaster.
-                    this.tray.forEach(function(coaster) {
-                        var i = floor(random(indexes.length));
-                        this.pieces[indexes[i]].reset(coaster);
-                        indexes.splice(i, 1);
-                    }, this);
-                };
+                // Assign pieces to tray coasters.
 
-                Puzzle.prototype.releaseDraggedPiece = function() {
-                    // Locate center of piece's upper/left corner tile.
-                    // Use mouse's location instead of draggedPiece in case the piece hasn't yet caught up to the mouse.
-                    var x = mouse.x + (TILE_SIZE - draggedPiece.width) / 2;
-                    var y = mouse.y + (TILE_SIZE - draggedPiece.height) / 2;
+                // Create list of indexes into this.pieces.
+                var indexes = [];
+                for (var i = 0; i < this.pieces.length; i++) {
+                    indexes.push(i);
+                }
+                // For each coaster on the tray, randomly select a piece to place on the coaster.
+                this.tray.forEach(function(coaster) {
+                    var i = floor(random(indexes.length));
+                    this.pieces[indexes[i]].reset(coaster);
+                    indexes.splice(i, 1);
+                }, this);
+            };
 
-                    // Locate the empty board tile beneath every piece tile.
-                    draggedPiece.tiles.forEach(function(pieceTile) {
-                        pieceTile.boardTile = this.board.tiles.find(function(boardTile) {
-                            return !boardTile.piece &&
-                                boardTile.isUnder(x + pieceTile.column * TILE_SIZE,
-                                    y + pieceTile.row * TILE_SIZE);
-                        });
-                    }, this);
+            Puzzle.prototype.releaseDraggedPiece = function() {
+                // Locate center of piece's upper/left corner tile.
+                // Use mouse's location instead of draggedPiece in case the piece hasn't yet caught up to the mouse.
+                var x = mouse.x + (TILE_SIZE - draggedPiece.width) / 2;
+                var y = mouse.y + (TILE_SIZE - draggedPiece.height) / 2;
 
-                    // Is every piece tile above a board tile?
-                    if (draggedPiece.tiles.every(function(tile) {
-                            return tile.boardTile;
+                // Locate the empty board tile beneath every piece tile.
+                draggedPiece.tiles.forEach(function(pieceTile) {
+                    pieceTile.boardTile = this.board.tiles.find(function(boardTile) {
+                        return !boardTile.piece &&
+                            boardTile.isUnder(x + pieceTile.column * TILE_SIZE,
+                                y + pieceTile.row * TILE_SIZE);
+                    });
+                }, this);
+
+                // Is every piece tile above a board tile?
+                if (draggedPiece.tiles.every(function(tile) {
+                        return tile.boardTile;
+                    })) {
+                    // Set a reference to the piece on every board tile beneath it.
+                    draggedPiece.tiles.forEach(function(tile) { tile.boardTile.piece = draggedPiece; });
+
+                    // Center piece over the area on which it fits into the board.
+                    var tile = draggedPiece.tiles[0];
+                    draggedPiece.target = new PVector(tile.boardTile.left - tile.column * TILE_SIZE + draggedPiece.width / 2,
+                        tile.boardTile.top - tile.row * TILE_SIZE + draggedPiece.height / 2);
+
+                    // Do all board tiles contain a piece?  I.e., has the puzzle just been solved?
+                    if (this.board.tiles.every(function(tile) {
+                            return tile.piece;
                         })) {
-                        // Set a reference to the piece on every board tile beneath it.
-                        draggedPiece.tiles.forEach(function(tile) { tile.boardTile.piece = draggedPiece; });
+                        // Was this the last puzzle to have been solved?
+                        var allBefore = puzzles.every(function(p) {
+                            return p.hasEverBeenSolved;
+                        });
+                        this.hasEverBeenSolved = this.isSolved = true;
+                        var lastPuzzleSoved = allBefore !== puzzles.every(function(p) {
+                            return p.hasEverBeenSolved;
+                        });
 
-                        // Center piece over the area on which it fits into the board.
-                        var tile = draggedPiece.tiles[0];
-                        draggedPiece.target = new PVector(tile.boardTile.left - tile.column * TILE_SIZE + draggedPiece.width / 2,
-                            tile.boardTile.top - tile.row * TILE_SIZE + draggedPiece.height / 2);
+                        // Is the first time that ALL puzzles have been marked as having ever been solved...
+                        this.solvedMessage = lastPuzzleSoved ? 'Congratulations!\nAll Puzzles\n Solved!' :
+                            'Puzzle\nSolved';
+                        this.messageCompleteTime = (this.messageStartTime = system.time) + 500; // 1/2 second to grow message
+                        this.messageEndTime = this.messageCompleteTime + (lastPuzzleSoved ? Infinity : 500); // 1/2 second before next puzzle
 
-                        // Do all board tiles contain a piece?  I.e., has the puzzle just been solved?
-                        if (this.board.tiles.every(function(tile) {
-                                return tile.piece;
-                            })) {
-                            // Was this the last puzzle to have been solved?
-                            var allBefore = puzzles.every(function(p) {
-                                return p.hasEverBeenSolved;
-                            });
-                            this.hasEverBeenSolved = this.isSolved = true;
-                            var lastPuzzleSoved = allBefore !== puzzles.every(function(p) {
-                                return p.hasEverBeenSolved;
-                            });
+                        // Enable the "next puzzle" button.
+                        this[RIGHT] = this.index < puzzles.length - 1;
+                    }
+                } else {
+                    // Cancel drag; send piece back to tray.
+                    draggedPiece.target = draggedPiece.coaster;
+                }
 
-                            // Is the first time that ALL puzzles have been marked as having ever been solved...
-                            this.solvedMessage = lastPuzzleSoved ? 'Congratulations!\nAll Puzzles\n Solved!' :
-                                'Puzzle\nSolved';
-                            this.messageCompleteTime = (this.messageStartTime = system.time) + 500; // 1/2 second to grow message
-                            this.messageEndTime = this.messageCompleteTime + (lastPuzzleSoved ? Infinity : 500); // 1/2 second before next puzzle
+                draggedPiece = draggedPiece.isLockedToMouse = false;
+            };
 
-                            // Enable the "next puzzle" button.
-                            this[RIGHT] = this.index < puzzles.length - 1;
+            Puzzle.prototype._coasters = [ // Locations in the tray where each piece is hosted
+                [], // placeholder for 0 pieces
+                [new Coaster(200, 500)], // center coordinates
+                [new Coaster(152, 500), new Coaster(248, 500)],
+                [new Coaster(104, 500), new Coaster(200, 500), new Coaster(296, 500)],
+                [new Coaster(56, 500), new Coaster(152, 500), new Coaster(248, 500), new Coaster(344, 500)],
+                [new Coaster(152, 452), new Coaster(248, 452),
+                    new Coaster(104, 548), new Coaster(200, 548), new Coaster(296, 548)
+                ],
+                [new Coaster(104, 452), new Coaster(200, 452), new Coaster(296, 452),
+                    new Coaster(104, 548), new Coaster(200, 548), new Coaster(296, 548)
+                ],
+                [new Coaster(104, 452), new Coaster(200, 452), new Coaster(296, 452),
+                    new Coaster(56, 548), new Coaster(152, 548), new Coaster(248, 548), new Coaster(344, 548)
+                ],
+                [new Coaster(56, 452), new Coaster(152, 452), new Coaster(248, 452), new Coaster(344, 452),
+                    new Coaster(56, 548), new Coaster(152, 548), new Coaster(248, 548), new Coaster(344, 548)
+                ],
+                [new Coaster(80, 452), new Coaster(160, 452), new Coaster(240, 452), new Coaster(320, 452),
+                    new Coaster(40, 548), new Coaster(120, 548), new Coaster(200, 548), new Coaster(280, 548), new Coaster(360, 548)
+                ]
+            ]; // Locations in the tray where each piece is hosted
+
+            Puzzle.prototype._arrowButton = function(direction) {
+                pushMatrix();
+
+                // Position & orientate button.
+                var x = 35;
+                if (direction === LEFT) {
+                    translate(x, 40);
+                } else {
+                    translate(x = 365, 40);
+                    scale(-1, 1);
+                }
+
+                // Draw button background.
+                var opacity = this[direction] ? 255 : 128;
+                noStroke();
+                fill(60, 35, 20, opacity);
+                ellipse(1, 0, 45, 45);
+
+                // Draw arrow.
+                fill(225, 160, 64, opacity);
+                beginShape();
+                vertex(-15, 0);
+                vertex(0, -15);
+                vertex(0, -7);
+                vertex(15, -7);
+                vertex(15, 7);
+                vertex(0, 7);
+                vertex(0, 15);
+                endShape(CLOSE);
+
+                popMatrix();
+
+                // Is mouse over the button?
+                if (!draggedPiece && mouse.isInEllipse(x, 40, 45, 45)) {
+                    // Is the button enabled?
+                    if (this[direction]) {
+                        cursor(HAND);
+
+                        // Has the player left-clicked the button?
+                        if (system.scene === 'play' && mouse.consumeClick()) {
+                            system.changeScene('play', puzzle.index + (x < 200 ? -1 : 1));
                         }
                     } else {
-                        // Cancel drag; send piece back to tray.
-                        draggedPiece.target = draggedPiece.coaster;
+                        cursor('not-allowed');
                     }
+                }
+            };
 
-                    draggedPiece = draggedPiece.isLockedToMouse = false;
-                };
+            Puzzle.prototype.draw = function() {
+                this._arrowButton(LEFT);
+                this._arrowButton(RIGHT);
 
-                Puzzle.prototype._coasters = [ // Locations in the tray where each piece is hosted
-                    [], // placeholder for 0 pieces
-                    [new Coaster(200, 500)], // center coordinates
-                    [new Coaster(152, 500), new Coaster(248, 500)],
-                    [new Coaster(104, 500), new Coaster(200, 500), new Coaster(296, 500)],
-                    [new Coaster(56, 500), new Coaster(152, 500), new Coaster(248, 500), new Coaster(344, 500)],
-                    [new Coaster(152, 452), new Coaster(248, 452),
-                        new Coaster(104, 548), new Coaster(200, 548), new Coaster(296, 548)
-                    ],
-                    [new Coaster(104, 452), new Coaster(200, 452), new Coaster(296, 452),
-                        new Coaster(104, 548), new Coaster(200, 548), new Coaster(296, 548)
-                    ],
-                    [new Coaster(104, 452), new Coaster(200, 452), new Coaster(296, 452),
-                        new Coaster(56, 548), new Coaster(152, 548), new Coaster(248, 548), new Coaster(344, 548)
-                    ],
-                    [new Coaster(56, 452), new Coaster(152, 452), new Coaster(248, 452), new Coaster(344, 452),
-                        new Coaster(56, 548), new Coaster(152, 548), new Coaster(248, 548), new Coaster(344, 548)
-                    ],
-                    [new Coaster(80, 452), new Coaster(160, 452), new Coaster(240, 452), new Coaster(320, 452),
-                        new Coaster(40, 548), new Coaster(120, 548), new Coaster(200, 548), new Coaster(280, 548), new Coaster(360, 548)
-                    ]
-                ]; // Locations in the tray where each piece is hosted
-
-                Puzzle.prototype._arrowButton = function(direction) {
-                    pushMatrix();
-
-                    // Position & orientate button.
-                    var x = 35;
-                    if (direction === LEFT) {
-                        translate(x, 40);
-                    } else {
-                        translate(x = 365, 40);
-                        scale(-1, 1);
+                // Level #
+                if (system.scene === 'play') {
+                    text('Level #' + (puzzle.index + 1), 200, 40);
+                    // Does player want to reset the level?
+                    if (mouse.isInRect(80, 15, 240, 50) && mouse.consumeClick(RIGHT)) {
+                        system.changeScene('play', puzzle.index);
                     }
+                } else /* system.scene === 'title' */ {
+                    text(puzzles.length + ' Levels!', 200, 40);
+                }
 
-                    // Draw button background.
-                    var opacity = this[direction] ? 255 : 128;
-                    noStroke();
-                    fill(60, 35, 20, opacity);
-                    ellipse(1, 0, 45, 45);
+                // Tray.
 
-                    // Draw arrow.
-                    fill(225, 160, 64, opacity);
-                    beginShape();
-                    vertex(-15, 0);
-                    vertex(0, -15);
-                    vertex(0, -7);
-                    vertex(15, -7);
-                    vertex(15, 7);
-                    vertex(0, 7);
-                    vertex(0, 15);
-                    endShape(CLOSE);
+                if (!mouse.isLocked && !draggedPiece) {
+                    this.tray.forEach(this._drawCoaster);
+                }
 
-                    popMatrix();
+                this.board.draw();
+                this.pieces.forEach(this._updatePiece);
+                this.pieces.sort(this._sortPieces).forEach(this._drawPiece);
 
-                    // Is mouse over the button?
-                    if (!draggedPiece && mouse.isInEllipse(x, 40, 45, 45)) {
-                        // Is the button enabled?
-                        if (this[direction]) {
-                            cursor(HAND);
 
-                            // Has the player left-clicked the button?
-                            if (system.scene === 'play' && mouse.consumeClick()) {
-                                system.changeScene('play', puzzle.index + (x < 200 ? -1 : 1));
-                            }
-                        } else {
-                            cursor('not-allowed');
-                        }
+
+                if (draggedPiece) {
+                    // cursor(MOVE);
+                }
+            };
+
+            Puzzle.prototype._drawCoaster = function(coaster) {
+                // Does the coaster host a piece -AND- is the mouse over the coaster?
+                if (coaster.piece && mouse.isInRect(coaster.point.x - 40, coaster.point.y - 40, 80, 80)) {
+                    cursor(HAND);
+
+                    // Start drag?
+                    if (mouse.isPressed && mouseButton === LEFT) {
+                        (draggedPiece = coaster.piece).target = mouse;
+                        coaster.piece = false;
                     }
-                };
+                }
+            };
 
-                Puzzle.prototype.draw = function() {
-                    this._arrowButton(LEFT);
-                    this._arrowButton(RIGHT);
+            Puzzle.prototype._updatePiece = function(piece) {
+                piece.update();
+            };
 
-                    // Level #
-                    if (system.scene === 'play') {
-                        text('Level #' + (puzzle.index + 1), 200, 40);
-                        // Does player want to reset the level?
-                        if (mouse.isInRect(80, 15, 240, 50) && mouse.consumeClick(RIGHT)) {
-                            system.changeScene('play', puzzle.index);
-                        }
-                    } else /* system.scene === 'title' */ {
-                        text(puzzles.length + ' Levels!', 200, 40);
-                    }
+            Puzzle.prototype._sortPieces = function(a, b) {
+                return b.zOrder - a.zOrder;
+            };
 
-                    // Tray.
-                  
-                    if (!mouse.isLocked && !draggedPiece) {
-                        this.tray.forEach(this._drawCoaster);
-                    }
+            Puzzle.prototype._drawPiece = function(piece) {
+                piece.draw();
+            };
 
-                    this.board.draw();
-                    this.pieces.forEach(this._updatePiece);
-                    this.pieces.sort(this._sortPieces).forEach(this._drawPiece);
-
-
-
-                    if (draggedPiece) {
-                        // cursor(MOVE);
-                    }
-                };
-
-                { // Callbacks used by Puzzle.prototype.draw
-                    Puzzle.prototype._drawCoaster = function(coaster) {
-                        // Does the coaster host a piece -AND- is the mouse over the coaster?
-                        if (coaster.piece && mouse.isInRect(coaster.point.x - 40, coaster.point.y - 40, 80, 80)) {
-                            cursor(HAND);
-                            (fill)(255, 32);
-                            rect(coaster.point.x - 40, coaster.point.y - 40, 80, 80, 5);
-                            // Start drag?
-                            if (mouse.isPressed && mouseButton === LEFT) {
-                                (draggedPiece = coaster.piece).target = mouse;
-                                coaster.piece = false;
-                            }
-                        }
-                    };
-
-                    Puzzle.prototype._updatePiece = function(piece) {
-                        piece.update();
-                    };
-
-                    Puzzle.prototype._sortPieces = function(a, b) {
-                        return b.zOrder - a.zOrder;
-                    };
-
-                    Puzzle.prototype._drawPiece = function(piece) {
-                        piece.draw();
-                    };
-                } // Callbacks used by Puzzle.prototype.draw
-            } // Puzzle
 
             cache.load = (function() {
                 var _step = 1;
