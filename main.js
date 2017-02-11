@@ -2,7 +2,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
     var canvas = document.getElementById("canvas");
     var processing = new Processing(canvas, function(processing) {
-        processing.size(400, 600);
+
+        var CANVAS_WIDTH = 600;
+        var CANVAS_HEIGHT = 400;
+        processing.size(CANVAS_WIDTH, CANVAS_HEIGHT);
         processing.background(0xFFF);
 
         var mouseIsPressed = false;
@@ -27,41 +30,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
         with(processing) {
 
-            // angleMode = "degrees";
-
-            /*
-            Block Puzzle - A series of fun & addictive logic puzzles.
-
-            Inspired by the app from BitMango: https://itunes.apple.com/us/app/-/id983489163
-
-            By: Blue Leaf  */
-            /** Sometimes Difficult, Always Solvable™ **/
-            /*
-
-                        Subscribe: https://www.khanacademy.org/cs/-/6145891777511424
-
-                        ACKNOWLEDGEMENTS:
-                            Adapted puzzle & piece outlining from Peter Collingridge:
-                                https://www.khanacademy.org/profile/peterwcollingridge/
-                                https://www.khanacademy.org/cs/find-outlines/6733900069076992
-                        */
-            /**
-                        INSTRUCTIONS:
-                            • Drag the blocks to fill the game board.
-                            • Have Fun! :)
-
-                        MORE ABOUT THE GAME:
-                            • There are 24 levels.
-                            • You may go back to previously completed puzzles, but may not skip ahead (unless you change the 'unlockAllPuzzles' variable.
-                            • Right-click the level # (at the top) to restart the level.
-                            • If you want to make a spin-off, you'll need to:
-                                • Click the "Spin-off" button beneath the canvas;
-                                • Click the "Save" button;
-                                • Click the "Settings" button above the canvas;
-                                • Change the height to 600;
-                                • Click the "Save and Close" button;
-                                • Refresh the webpage.
-                        **/
+          
             var unlockAllPuzzles = false;
 
             { // Miscellaneous
@@ -70,6 +39,26 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
                 var TILE_SIZE = 50;
                 var TRAY_TILE_SIZE = 20;
+
+                var BOARD_LEFT = 400;
+                var BOARD_TOP = 200;
+
+                var TRAY_TOP = -1;
+                var TRAY_LEFT = -1;
+                var TRAY_WIDTH = CANVAS_WIDTH/3;
+                var TRAY_HEIGHT = CANVAS_HEIGHT;
+
+                var BUTTON_LEFT=250;
+                var BUTTON_DISTANCE=300;
+
+                var LABEL_LEFT=300;
+                var LABEL_TOP=20;
+                var LABEL_WIDTH=200;
+                var LABEL_HEIGHT=40;
+                var LABEL_RADIUS=10;
+
+                var LABEL_TEXT_LEFT = LABEL_LEFT+100;
+                var LABEL_TEXT_TOP = LABEL_TOP+20;
 
                 var puzzles = []; // all puzzles
                 var puzzle; // current puzzle
@@ -563,8 +552,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
             { // Board
                 var Board = function(map) {
-                    this.left = 200 - (this.width = (this.columns = (this.map = map)[0].length) * TILE_SIZE) / 2;
-                    this.top = 234 - (this.height = (this.rows = map.length) * TILE_SIZE) / 2;
+                    this.left = BOARD_LEFT - (this.width = (this.columns = (this.map = map)[0].length) * TILE_SIZE) / 2;
+                    this.top = BOARD_TOP - (this.height = (this.rows = map.length) * TILE_SIZE) / 2;
 
                     // Compute the tiles & outlines.
                     this.tiles = [];
@@ -794,7 +783,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
                 Puzzle.prototype._coasters = [ // Locations in the tray where each piece is hosted
                     [], // placeholder for 0 pieces
-                    [new Coaster(200, 500)], // center coordinates
+                    [new Coaster(100, 200)], // center coordinates
                     [new Coaster(152, 500), new Coaster(248, 500)],
                     [new Coaster(104, 500), new Coaster(200, 500), new Coaster(296, 500)],
                     [new Coaster(56, 500), new Coaster(152, 500), new Coaster(248, 500), new Coaster(344, 500)],
@@ -819,11 +808,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     pushMatrix();
 
                     // Position & orientate button.
-                    var x = 35;
+                    var x = BUTTON_LEFT;
                     if (direction === LEFT) {
                         translate(x, 40);
                     } else {
-                        translate(x = 365, 40);
+                        x+=BUTTON_DISTANCE;
+                        translate(x, 40);
                         scale(-1, 1);
                     }
 
@@ -871,12 +861,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     stroke(60, 35, 20);
                     strokeWeight(2);
                     fill(225, 160, 64);
-                    rect(80, 15, 240, 50, 10);
+                    rect(LABEL_LEFT, LABEL_TOP, LABEL_WIDTH, LABEL_HEIGHT, LABEL_RADIUS);
                     fill(60, 35, 20);
                     textFont(fonts.levelId);
                     textAlign(CENTER, CENTER);
                     if (system.scene === 'play') {
-                        text('Level #' + (puzzle.index + 1), 200, 40);
+                        text('Level #' + (puzzle.index + 1), LABEL_TEXT_LEFT, LABEL_TEXT_TOP);
                         // Does player want to reset the level?
                         if (mouse.isInRect(80, 15, 240, 50) && mouse.consumeClick(RIGHT)) {
                             system.changeScene('play', puzzle.index);
@@ -888,7 +878,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     // Tray.
                     noStroke();
                     fill(60, 35, 20);
-                    rect(-1, 400, 402, 200);
+                    rect(TRAY_LEFT, TRAY_LEFT, TRAY_WIDTH, TRAY_HEIGHT);
                     // Blend background color into tray color.
                     for (var y = 397; y <= 403; y++) {
                         stroke(lerpColor(color(229, 173, 110), color(60, 35, 20), norm(y, 397, 403)));
@@ -903,19 +893,19 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     this.pieces.sort(this._sortPieces).forEach(this._drawPiece);
 
                     // Tutorial arrow.
-                    if (puzzle.index === 0 && !puzzle.hasEverBeenSolved) {
-                        stroke(255, 64, 64);
-                        strokeWeight(6);
-                        noFill();
-                        var center = puzzle.tray[0].point.get();
-                        ellipse(center.x, center.y, 95, 95); // draw circle around piece
-                        arc(240, 370, 160, 310, 147, 230);
-                        pushMatrix();
-                        translate(puzzle.board.left + puzzle.board.width / 2, puzzle.board.top + puzzle.board.height / 2);
-                        rotate(210);
-                        bezier(-30, -50, -20, 20, 20, 20, 30, -50);
-                        popMatrix();
-                    }
+                    // if (puzzle.index === 0 && !puzzle.hasEverBeenSolved) {
+                    //     stroke(255, 64, 64);
+                    //     strokeWeight(6);
+                    //     noFill();
+                    //     var center = puzzle.tray[0].point.get();
+                    //     ellipse(center.x, center.y, 95, 95); // draw circle around piece
+                    //     arc(240, 370, 160, 310, 147, 230);
+                    //     pushMatrix();
+                    //     translate(puzzle.board.left + puzzle.board.width / 2, puzzle.board.top + puzzle.board.height / 2);
+                    //     rotate(210);
+                    //     bezier(-30, -50, -20, 20, 20, 20, 30, -50);
+                    //     popMatrix();
+                    // }
 
                     if (draggedPiece) {
                         cursor(MOVE);
@@ -1010,14 +1000,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
                             if (_endTime <= system.time) {
                                 _direction = _image = mouse.isLocked = false;
                             } else if (_direction === LEFT) {
-                                translate(map(system.time, _startTime, _endTime, width, 0), 0);
-                                image(_image, -width, 0);
+                                // translate(map(system.time, _startTime, _endTime, width, 0), 0);
+                                // image(_image, -width, 0);
                             } else if (_direction === RIGHT) {
-                                translate(map(system.time, _startTime, _endTime, -width, 0), 0);
-                                image(_image, width, 0);
+                                // translate(map(system.time, _startTime, _endTime, -width, 0), 0);
+                                // image(_image, width, 0);
                             } else /* _direction === DOWN */ {
-                                translate(0, map(system.time, _startTime, _endTime, -height, 0));
-                                image(_image, 0, height);
+                                // translate(0, map(system.time, _startTime, _endTime, -height, 0));
+                                // image(_image, 0, height);
                             }
                         }
                     }
@@ -1038,11 +1028,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 puzzle.draw();
 
                 if (puzzle.isSolved) {
-                    translate(200, 500);
-                    scale(constrain(norm(system.time, puzzle.messageStartTime, puzzle.messageCompleteTime), 0, 1));
-                    textFont(fonts.solved);
-                    fill(229, 173, 110);
-                    text(puzzle.solvedMessage, 0, 0);
+                    // translate(200, 500);
+                    // scale(constrain(norm(system.time, puzzle.messageStartTime, puzzle.messageCompleteTime), 0, 1));
+                    // textFont(fonts.solved);
+                    // fill(229, 173, 110);
+                    // text(puzzle.solvedMessage, 0, 0);
 
                     // Is it time to auto-advance to another puzzle?
                     if (system.time >= puzzle.messageEndTime) {
@@ -1123,7 +1113,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 if (system.frames === 1) {
                     frameRate(Infinity);
 
-                    sceneSplash.image = getImage('avatars/leaf-blue');
+                    // sceneSplash.image = getImage('avatars/leaf-blue');
                     sceneSplash.startTime = system.time;
                 }
 
@@ -1160,23 +1150,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
                 background(250, 174, 80); // orange
                 fill(29, 86, 170, peg(map(frame, 100, 120, 0, 255))); // blue
-                textFont(createFont('Arial Bold'), 48);
-                textAlign(CENTER, TOP);
-                text('Blue Leaf Studio', 200, 300);
 
                 translate(220 + cos(angle) * radius, sin(angle) * radius);
                 rotate(rotation);
-                image(sceneSplash.image, -xSize / 2, -ySize / 2, xSize, ySize);
+                // image(sceneSplash.image, -xSize / 2, -ySize / 2, xSize, ySize);
+                // system.changeScene('title', keyCode);
+                system.changeScene('play', 0);
 
-                sceneSplash.dismiss = sceneSplash.dismiss || mouse.isClicked || frame >= 180; // 180 frames / 45 fps = 4 second duration
-                if (!mouseIsPressed && sceneSplash.dismiss && cache.isLoaded) {
-                    puzzle = false;
-                    if (mouseButton === RIGHT && (keyCode === UP || keyCode === DOWN)) {
-                        system.changeScene('title', keyCode);
-                    } else {
-                        system.changeScene('play', 0);
-                    }
-                }
+
             };
 
             { // Processing.JS events
