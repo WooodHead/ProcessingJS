@@ -311,17 +311,26 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 };
 
                 Piece.prototype.update = function() {
+                    // console.log("this.isLockedToMouse",this.isLockedToMouse);
                     if (this.isLockedToMouse) {
                         // console.log("msg");
                         this.point.set(mouse.x, mouse.y);
+                        console.log("this.point",this.point);
                     } else if (this.target) { // target may be a Coaster, PVector, or mouse
                         // console.log("msg");
+                        console.log("this.target",this.target);
 
                         var targetPoint = (this.target instanceof PVector ? this.target : this.target.point);
+                        console.log("targetPoint",targetPoint);
                         var diff = PVector.sub(targetPoint, this.point);
+                        
+                        console.log("diff",diff);
+
                         var distance = diff.mag();
                         if (distance <= 10) {
                             this.point.set(targetPoint);
+                            console.log("this.point",this.point);
+
                             this.isLockedToMouse = this.target === mouse;
                             if (this.target instanceof Coaster) {
                                 this.target.piece = this;
@@ -329,8 +338,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
                             this.target = false;
                         } else {
                             diff.normalize();
+                            console.log("diff",diff);
                             diff.mult(this.target === mouse ? max(10, distance / 4) : 10);
                             this.point.add(diff);
+                            console.log("this.point",this.point);
+
                         }
                     }
                 };
@@ -347,7 +359,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     translate(this.point.x, this.point.y);
                     // scale(constrain(map(this.point.y, this.coaster.point.y, 400, TRAY_TILE_SIZE, TILE_SIZE), TRAY_TILE_SIZE, TILE_SIZE) / TILE_SIZE); // 400 is the y-coor of the top of the tray
                     translate(-this.width / 2, -this.height / 2);
-                    
+
                     // console.log("-this.width / 2",-this.width / 2);
                     // console.log("-this.height / 2",-this.height / 2);
                     // strokeWeight(4);
@@ -490,7 +502,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 
                 var Puzzle = function(index) {
+                    console.log("this._coasters",this._coasters);
+
                     this.tray = this._coasters[(this.pieces = (this.board = new Board(this.map = maps[this.index = index])).pieces).length];
+                    console.log(this.tray);
                     // this.hasEverBeenSolved = this.isSolved = false;
                 };
 
@@ -502,9 +517,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     for (var i = 0; i < this.pieces.length; i++) {
                         indexes.push(i);
                     }
+                    console.log("indexes",indexes);
                     // For each coaster on the tray, randomly select a piece to place on the coaster.
                     this.tray.forEach(function(coaster) {
                         var i = floor(random(indexes.length));
+                        // console.log(i);
                         this.pieces[indexes[i]].reset(coaster);
 
                     }, this);
@@ -578,6 +595,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 Puzzle.prototype._drawCoaster = function(coaster) {
                     // Does the coaster host a piece -AND- is the mouse over the coaster?
                     if (coaster.piece && mouse.isInRect(coaster.point.x - 40, coaster.point.y - 40, 80, 80)) {
+                        console.log("isInRect");
                         cursor(HAND);
 
                         // Start drag?
@@ -679,6 +697,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
                 mousePressed = function() {
                     mouse.isPressed = !mouse.isLocked;
+                    console.log("mouse.isLocked",mouse.isLocked);
+                    console.log("mouse.isPressed",mouse.isPressed);
                 };
 
                 mouseReleased = function() {
@@ -688,6 +708,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     } else {
                         // mouse.isClicked = !mouse.isLocked;
                     }
+
+                    console.log("mouse.isLocked",mouse.isLocked);
+                    console.log("mouse.isPressed",mouse.isPressed);
+                    
                 };
 
 
