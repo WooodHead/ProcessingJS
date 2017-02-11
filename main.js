@@ -273,13 +273,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 var Piece = function(grid, tiles, number) {
                     this.border = computeOutlines(grid, this.tiles = tiles, -2)[0];
 
+                    console.log("this.border",this.border);
                     // this.edgeColor = lerpColor(this.faceColor = this._colors[number], color(0), 0.35);
                     // console.log(this.edgeColor );
                     this.width = (this.columns = grid[0].length) * TILE_SIZE;
                     this.height = (this.rows = grid.length) * TILE_SIZE;
 
                     this.point = new PVector(0, 0); // center's location
-                    console.log(this.point);
+                    console.log("this.point",this.point);
                 };
 
                 Object.defineProperties(Piece.prototype, {
@@ -311,8 +312,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
                 Piece.prototype.update = function() {
                     if (this.isLockedToMouse) {
+                        // console.log("msg");
                         this.point.set(mouse.x, mouse.y);
                     } else if (this.target) { // target may be a Coaster, PVector, or mouse
+                        // console.log("msg");
+
                         var targetPoint = (this.target instanceof PVector ? this.target : this.target.point);
                         var diff = PVector.sub(targetPoint, this.point);
                         var distance = diff.mag();
@@ -332,11 +336,20 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 };
 
                 Piece.prototype.draw = function() {
+                    // console.log("this.point.x",this.point.x);
+                    // console.log("this.point.y",this.point.y);
+
                     pushMatrix();
+
+                    // console.log("this.point.x",this.point.x);
+                    // console.log("this.point.y",this.point.y);
+
                     translate(this.point.x, this.point.y);
                     // scale(constrain(map(this.point.y, this.coaster.point.y, 400, TRAY_TILE_SIZE, TILE_SIZE), TRAY_TILE_SIZE, TILE_SIZE) / TILE_SIZE); // 400 is the y-coor of the top of the tray
                     translate(-this.width / 2, -this.height / 2);
-
+                    
+                    // console.log("-this.width / 2",-this.width / 2);
+                    // console.log("-this.height / 2",-this.height / 2);
                     // strokeWeight(4);
                     // stroke(this.edgeColor);
                     // fill(this.faceColor);
